@@ -1,0 +1,25 @@
+{
+  "name": "github-labels-copy",
+  "version": "1.0.0",
+  "description": "How to Copy GitHub Labels from One Project to Another",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FMCalisto/github-labels-copy.git"
+  },
+  "author": "Francisco Maria Calisto",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/FMCalisto/github-labels-copy/issues"
+  },
+  "homepage": "https://github.com/FMCalisto/github-labels-copy#readme",
+  "dependencies": {
+    "copy-github-labels": "^1.3.1",
+    "extend": "^3.0.1",
+    "github": "^13.1.0"
+  }
+}
