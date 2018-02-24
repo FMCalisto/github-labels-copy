@@ -1,8 +1,8 @@
 # GitHub Labels Copy
 
-<div style="text-align:center">
+<p align="center">
 <img src="assets/bouncercat.png" width="25%" />
-</div>
+</p>
 
 Typically, a [GitHub](https://github.com/) account consists of several sub-projects. To make the labels consistent, we can use some tool to copy the label from a source project to a destination project. The purpose of this repository is to help doing this job more easily, with less effort. This repository is using the [`copy-github-labels`](https://github.com/jvandemo/copy-github-labels) as dependency. To organize the scrum workflow follow [this](https://github.com/jvandemo/github-scrum-workflow) work.
 
