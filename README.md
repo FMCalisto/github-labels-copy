@@ -1,6 +1,6 @@
 # GitHub Labels Copy
 
-How to Copy GitHub Labels from One Project to Another
+Typically, a [GitHub](https://github.com/) account consists of several sub-projects. To make the labels consistent, we can use some tool to copy the label from a source project to a destination project. The purpose of this repository is to help doing this job more easily, with less effort.
 
 ## Clone & Install
 
