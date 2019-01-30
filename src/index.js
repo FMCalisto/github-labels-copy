@@ -10,14 +10,20 @@ var options = {
 var copyGitHubLabels = require('copy-github-labels')(options);
 
 // Repository Objects
-var source = {
+var src = {
   user: 'FMCalisto',
   repo: 'github-labels-copy'
 };
-var destination = {
-  user: '',
-  repo: ''
+var dst = {
+  user: 'MIMBCD-UI',
+  repo: 'clinical-annotators-filler'
 };
+
+var scp = '/';
+
+// Define source and destination
+var srcPath = src.user + scp + src.repo;
+var dstPath = dst.user + scp + dst.repo;
 
 // Optionally use credentials
 copyGitHubLabels.authenticate({
@@ -28,7 +34,7 @@ copyGitHubLabels.authenticate({
 // Copy labels from one repository to another
 // The callback is called for every label but no actual
 // copy operation is performed, so the destination repository is not updated.
-copyGitHubLabels.copy(source, destination, function (err, label){
+copyGitHubLabels.copy(srcPath, dstPath, function (err, label){
 
   // Log errors
   if(err){
