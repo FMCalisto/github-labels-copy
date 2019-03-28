@@ -15,8 +15,8 @@ var src = {
   repo: 'github-labels-copy'
 };
 var dst = {
-  user: 'MIMBCD-UI',
-  repo: 'clinical-annotators-filler'
+  user: 'BreastScreening',
+  repo: 'finders-datasets'
 };
 
 var scp = '/';
