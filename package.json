@@ -19,7 +19,7 @@
   "homepage": "https://github.com/FMCalisto/github-labels-copy#readme",
   "dependencies": {
     "copy-github-labels": "^2.0.0",
-    "extend": "^3.0.1",
-    "github": "^13.1.0"
+    "extend": "^3.0.2",
+    "github": "^14.0.0"
   }
 }

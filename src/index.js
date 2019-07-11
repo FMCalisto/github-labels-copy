@@ -15,8 +15,8 @@ var src = {
   repo: 'github-labels-copy'
 };
 var dst = {
-  user: 'BreastScreening',
-  repo: 'finders-datasets'
+  user: '',
+  repo: ''
 };
 
 var scp = '/';
