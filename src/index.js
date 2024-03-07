@@ -1,11 +1,15 @@
 const { Octokit } = require("@octokit/rest");
+const config = require("./config.json"); // Load the configuration
 
 // Initialize a new octokit instance with your GitHub personal access token
 const octokit = new Octokit({
-  auth: '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'
+  auth: config.githubToken
 });
 
 async function copyLabels(sourceOwner, sourceRepo, targetOwner, targetRepo) {
+  
+  const { sourceOwner, sourceRepo, targetOwner, targetRepo } = config; // Destructuring for easier access
+  
   try {
     // Fetch all labels from the source repository
     const { data: sourceLabels } = await octokit.rest.issues.listLabelsForRepo({
@@ -43,4 +47,4 @@ async function copyLabels(sourceOwner, sourceRepo, targetOwner, targetRepo) {
 }
 
 // Replace 'sourceOwner', 'sourceRepo', 'targetOwner', and 'targetRepo' with actual values
-copyLabels('FMCalisto', 'github-labels-copy', 'FMCalisto', 'redux-get-started');
+copyLabels();
