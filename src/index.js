@@ -1,47 +1,140 @@
-// Define custom options
-var options = {
+/**
+ * Module dependencies
+ */
+var GitHubApi = require("@octokit/rest");
+var extend = require('extend');
 
-  // Dry run is a special option that allows us to perform
-  // a test run without actually copying the labels.
-  dryRun: false
+// Arrow functions aren't allowed as constructors
+module.exports = function (opts) {
+  var self = {};
+
+  var defaultOptions = {
+    headers: {
+      "user-agent": "Copy-GitHub-Labels", // GitHub is happy with a unique user agent
+      accept: "application/vnd.github.symmetra-preview+json" // Enable emoji + description support
+    }
+  };
+
+  var options = extend({}, defaultOptions, opts);
+
+  self.github = new GitHubApi(options);
+
+  /**
+   * Authenticates with GitHub
+   * @param {*} credentials The credentials used for authenticating.
+   */
+  self.authenticate = (credentials) => self.github.authenticate(credentials);
+  /**
+   * Copies labels from the source repository to the destination repository
+   * @param {string} sourceRepository The source repository to copy labels from
+   * @param {string} destinationRepository The destination repository to copy labels to
+   * @param {copyLabelsCallback} [cb] The callback function after this is executed.
+   */
+  self.copy = (sourceRepository, destinationRepository, cb) => {
+    sourceRepository = parseRepo(sourceRepository);
+    destinationRepository = parseRepo(destinationRepository);
+    cb = cb || function () { };
+
+    if (!sourceRepository) {
+      return cb(new Error('Invalid source repository'));
+    }
+
+    if (!destinationRepository) {
+      return cb(new Error('Invalid destination repository'));
+    }
+
+    // Get all labels from source
+    self.github.issues.listLabelsForRepo(sourceRepository).then(result => {
+      result.data.forEach((label) => {
+        if (options.dryRun) {
+          return cb(null, label);
+        }
+        var labelToCreate = {
+          owner: destinationRepository.owner,
+          repo: destinationRepository.repo,
+          name: label.name,
+          color: label.color
+        };
+        // Check if label has description
+        if (label.description) {
+          labelToCreate.description = label.description;
+        }
+        // Create label in destination repository
+        self.github.issues.createLabel(labelToCreate, (err, res) => {
+          if (err) {
+            return cb(err);
+          }
+          return cb(null, res);
+        });
+      });
+
+      // If the response contains a link header with rel="next", then
+      // fetch the following page because there are more labels available
+      if (labels.meta && labels.meta.hasOwnProperty('link')) {
+        if (labels.meta.link.indexOf('rel="next"') !== -1) {
+          sourceRepository.page += 1;
+          self.copy(sourceRepository, destinationRepository, cb);
+        }
+      }
+    }).catch(err => { return cb(err) });
+  };
+
+  return self;
 };
 
-// Instantiate with custom options
-var copyGitHubLabels = require('copy-github-labels')(options);
+/**
+ * Parse repository
+ *
+ * Accepts string like:
+ *
+ * 'FMCalisto/copy-github-labels'
+ *
+ * or objects like:
+ *
+ * {
+ *   user: 'UserName',
+ * 	 repo: 'copy-github-labels'
+ * }
+ * @param repo
+ * @returns {*}
+ */
+const parseRepo = (input) => {
+  if (typeof input === 'string') {
+    var parts = input.split('/');
+    if (parts.length < 2) {
+      return null;
+    }
+    return {
+      owner: parts[0],
+      repo: parts[1],
+      page: 1
+    }
+  }
+  if (input.user && input.repo) {
+    if (!input.hasOwnProperty('page')) {
+      input.page = 1;
+    }
+    return input;
+  }
+  return null;
+}
 
-// Repository Objects
-var src = {
-  user: 'FMCalisto',
-  repo: 'github-labels-copy'
-};
-var dst = {
-  user: '',
-  repo: ''
-};
+/**
+ * Callback used in {@link copyGitHubLabels#copy}
+ * @callback copyLabelsCallback
+ * @param {*} error The error thrown when an error occured
+ * @param {*} label The label object
+ */
 
-var scp = '/';
-
-// Define source and destination
-var srcPath = src.user + scp + src.repo;
-var dstPath = dst.user + scp + dst.repo;
+// Instantiate
+var copyGitHubLabels = require('copy-github-labels')();
 
 // Or use oauth key/ secret
 copyGitHubLabels.authenticate({
   type: 'oauth',
-  key: 'clientID',
-  secret: 'clientSecret'
+  key: 'd4dba548a0ac9ad9908e',
+  secret: '72c97b6feea656ba560f86a4fc267bc87dd21a67'
 });
 
 // Copy labels from one repository to another
-// The callback is called for every label but no actual
-// copy operation is performed, so the destination repository is not updated.
-copyGitHubLabels.copy(srcPath, dstPath, function (err, label){
-
-  // Log errors
-  if(err){
-    return console.log('Could not copy label: ' + JSON.stringify(err));
-  }
-
-  // Log copies
-  console.log('Label copied successfully: ' + JSON.stringify(label))
-});
+copyGitHubLabels.copy('FMCalisto/github-labels-copy', 'FMCalisto/redux-get-started');

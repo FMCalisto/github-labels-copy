@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "How to Copy GitHub Labels from One Project to Another",
   "main": "src/index.js",
+  "dependencies": {
+    "copy-github-labels": "^2.0.0",
+    "extend": "^3.0.2",
+    "github": "^14.0.0"
+  },
+  "devDependencies": {
+    "chai": "^4.1.2",
+    "inquirer": "^5.2.0",
+    "mocha": "^10.3.0"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node ."
@@ -16,10 +26,5 @@
   "bugs": {
     "url": "https://github.com/FMCalisto/github-labels-copy/issues"
   },
-  "homepage": "https://github.com/FMCalisto/github-labels-copy#readme",
-  "dependencies": {
-    "copy-github-labels": "^2.0.0",
-    "extend": "^3.0.2",
-    "github": "^14.0.0"
-  }
+  "homepage": "https://github.com/FMCalisto/github-labels-copy#readme"
 }
