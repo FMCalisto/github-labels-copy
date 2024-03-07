@@ -6,7 +6,7 @@ const octokit = new Octokit({
   auth: config.githubToken
 });
 
-async function copyLabels(sourceOwner, sourceRepo, targetOwner, targetRepo) {
+async function copyLabels() {
   
   const { sourceOwner, sourceRepo, targetOwner, targetRepo } = config; // Destructuring for easier access
   
