@@ -1,140 +1,46 @@
-/**
- * Module dependencies
- */
-var GitHubApi = require("@octokit/rest");
-var extend = require('extend');
+const { Octokit } = require("@octokit/rest");
 
-// Arrow functions aren't allowed as constructors
-module.exports = function (opts) {
-  var self = {};
-
-  var defaultOptions = {
-    headers: {
-      "user-agent": "Copy-GitHub-Labels", // GitHub is happy with a unique user agent
-      accept: "application/vnd.github.symmetra-preview+json" // Enable emoji + description support
-    }
-  };
-
-  var options = extend({}, defaultOptions, opts);
-
-  self.github = new GitHubApi(options);
-
-  /**
-   * Authenticates with GitHub
-   * @param {*} credentials The credentials used for authenticating.
-   */
-  self.authenticate = (credentials) => self.github.authenticate(credentials);
-  /**
-   * Copies labels from the source repository to the destination repository
-   * @param {string} sourceRepository The source repository to copy labels from
-   * @param {string} destinationRepository The destination repository to copy labels to
-   * @param {copyLabelsCallback} [cb] The callback function after this is executed.
-   */
-  self.copy = (sourceRepository, destinationRepository, cb) => {
-    sourceRepository = parseRepo(sourceRepository);
-    destinationRepository = parseRepo(destinationRepository);
-    cb = cb || function () { };
-
-    if (!sourceRepository) {
-      return cb(new Error('Invalid source repository'));
-    }
-
-    if (!destinationRepository) {
-      return cb(new Error('Invalid destination repository'));
-    }
-
-    // Get all labels from source
-    self.github.issues.listLabelsForRepo(sourceRepository).then(result => {
-      result.data.forEach((label) => {
-        if (options.dryRun) {
-          return cb(null, label);
-        }
-        var labelToCreate = {
-          owner: destinationRepository.owner,
-          repo: destinationRepository.repo,
-          name: label.name,
-          color: label.color
-        };
-        // Check if label has description
-        if (label.description) {
-          labelToCreate.description = label.description;
-        }
-        // Create label in destination repository
-        self.github.issues.createLabel(labelToCreate, (err, res) => {
-          if (err) {
-            return cb(err);
-          }
-          return cb(null, res);
-        });
-      });
-
-      // If the response contains a link header with rel="next", then
-      // fetch the following page because there are more labels available
-      if (labels.meta && labels.meta.hasOwnProperty('link')) {
-        if (labels.meta.link.indexOf('rel="next"') !== -1) {
-          sourceRepository.page += 1;
-          self.copy(sourceRepository, destinationRepository, cb);
-        }
-      }
-    }).catch(err => { return cb(err) });
-  };
-
-  return self;
-};
-
-/**
- * Parse repository
- *
- * Accepts string like:
- *
- * 'FMCalisto/copy-github-labels'
- *
- * or objects like:
- *
- * {
- *   user: 'UserName',
- * 	 repo: 'copy-github-labels'
- * }
- * @param repo
- * @returns {*}
- */
-const parseRepo = (input) => {
-  if (typeof input === 'string') {
-    var parts = input.split('/');
-    if (parts.length < 2) {
-      return null;
-    }
-    return {
-      owner: parts[0],
-      repo: parts[1],
-      page: 1
-    }
-  }
-  if (input.user && input.repo) {
-    if (!input.hasOwnProperty('page')) {
-      input.page = 1;
-    }
-    return input;
-  }
-  return null;
-}
-
-/**
- * Callback used in {@link copyGitHubLabels#copy}
- * @callback copyLabelsCallback
- * @param {*} error The error thrown when an error occured
- * @param {*} label The label object
- */
-
-// Instantiate
-var copyGitHubLabels = require('copy-github-labels')();
-
-// Or use oauth key/ secret
-copyGitHubLabels.authenticate({
-  type: 'oauth',
-  key: 'd4dba548a0ac9ad9908e',
-  secret: '72c97b6feea656ba560f86a4fc267bc87dd21a67'
+// Initialize a new octokit instance with your GitHub personal access token
+const octokit = new Octokit({
+  auth: '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'
 });
 
-// Copy labels from one repository to another
-copyGitHubLabels.copy('FMCalisto/github-labels-copy', 'FMCalisto/redux-get-started');
+async function copyLabels(sourceOwner, sourceRepo, targetOwner, targetRepo) {
+  try {
+    // Fetch all labels from the source repository
+    const { data: sourceLabels } = await octokit.rest.issues.listLabelsForRepo({
+      owner: sourceOwner,
+      repo: sourceRepo,
+    });
+
+    // Fetch all labels from the target repository to check for duplicates
+    const { data: targetLabels } = await octokit.rest.issues.listLabelsForRepo({
+      owner: targetOwner,
+      repo: targetRepo,
+    });
+    const targetLabelNames = targetLabels.map(label => label.name);
+
+    for (const label of sourceLabels) {
+      // Check if the label already exists in the target repository
+      if (!targetLabelNames.includes(label.name)) {
+        // Create each label in the target repository
+        await octokit.rest.issues.createLabel({
+          owner: targetOwner,
+          repo: targetRepo,
+          name: label.name,
+          color: label.color,
+          description: label.description,
+        });
+      } else {
+        console.log(`Label "${label.name}" already exists in ${targetOwner}/${targetRepo}. Skipping.`);
+      }
+    }
+
+    console.log(`Successfully copied labels from ${sourceOwner}/${sourceRepo} to ${targetOwner}/${targetRepo}`);
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+
+// Replace 'sourceOwner', 'sourceRepo', 'targetOwner', and 'targetRepo' with actual values
+copyLabels('FMCalisto', 'github-labels-copy', 'FMCalisto', 'redux-get-started');
