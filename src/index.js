@@ -25,10 +25,11 @@ var scp = '/';
 var srcPath = src.user + scp + src.repo;
 var dstPath = dst.user + scp + dst.repo;
 
-// Optionally use credentials
+// Or use oauth key/ secret
 copyGitHubLabels.authenticate({
-  type: "oauth",
-  token: 'bef99f643ad8614b2c28b0aaa2d93ea626bb61c8'
+  type: 'oauth',
+  key: 'clientID',
+  secret: 'clientSecret'
 });
 
 // Copy labels from one repository to another
