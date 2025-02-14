@@ -18,6 +18,6 @@
   },
   "homepage": "https://github.com/FMCalisto/github-labels-copy#readme",
   "dependencies": {
-    "@octokit/rest": "^18.10.0"
+    "@octokit/rest": "^21.1.1"
   }
 }
