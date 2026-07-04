@@ -2,6 +2,10 @@
   "githubToken": "",
   "sourceOwner": "",
   "sourceRepo": "",
-  "targetOwner": "",
-  "targetRepo": ""
+  "targetRepos": [
+    {
+      "owner": "",
+      "repo": ""
+    }
+  ]
 }
