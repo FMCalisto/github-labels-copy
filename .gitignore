@@ -59,3 +59,9 @@ typings/
 
 # .gitignore content
 src/config.json
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode
